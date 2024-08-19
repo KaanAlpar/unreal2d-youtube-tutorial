@@ -32,6 +32,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UInputAction* MoveAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float MovementSpeed = 100.0f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	FVector2D MovementDirection;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	FVector2D HorizontalLimits;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	FVector2D VerticalLimits;
+
 	APlayerCharacter();
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
@@ -39,4 +51,7 @@ public:
 
 	void MoveTrigger(const FInputActionValue& Value);
 	void MoveCompleted(const FInputActionValue& Value);
+
+	bool IsInMapBoundsHorizontal(float XPos);
+	bool IsInMapBoundsVertical(float ZPos);
 };

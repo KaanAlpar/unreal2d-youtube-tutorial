@@ -15,12 +15,54 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	HorizontalLimits = FVector2D(-640.0f, 640.0f);
+	VerticalLimits = FVector2D(-360.0f, 360.0f);
 }
 
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// Move the player
+	if (MovementDirection.Length() > 0.0f)
+	{
+		if (MovementDirection.Length() > 1.0f)
+		{
+			MovementDirection.Normalize();
+		}
+
+		FVector2D DistanceToMove = MovementDirection * MovementSpeed * DeltaTime;
+		FVector NewLocation = GetActorLocation() + FVector(DistanceToMove.X, 0.0f, 0.0f);
+		if (!IsInMapBoundsHorizontal(NewLocation.X))
+		{
+			NewLocation -= FVector(DistanceToMove.X, 0.0f, 0.0f);
+		}
+		NewLocation += FVector(0.0f, 0.0f, DistanceToMove.Y);
+		if (!IsInMapBoundsVertical(NewLocation.Z))
+		{
+			NewLocation -= FVector(0.0f, 0.0f, DistanceToMove.Y);
+		}
+
+		SetActorLocation(NewLocation);
+	}
+}
+
+bool APlayerCharacter::IsInMapBoundsHorizontal(float XPos)
+{
+	bool Result = true;
+
+	Result = (XPos > HorizontalLimits.X) && (XPos < HorizontalLimits.Y);
+
+	return Result;
+}
+
+bool APlayerCharacter::IsInMapBoundsVertical(float ZPos)
+{
+	bool Result = true;
+
+	Result = (ZPos > VerticalLimits.X) && (ZPos < VerticalLimits.Y);
+
+	return Result;
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -49,10 +91,10 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 void APlayerCharacter::MoveTrigger(const FInputActionValue& Value)
 {
-
+	MovementDirection = Value.Get<FVector2D>();
 }
 
 void APlayerCharacter::MoveCompleted(const FInputActionValue& Value)
 {
-
+	MovementDirection = FVector2D(0.0f, 0.0f);
 }
