@@ -1,5 +1,7 @@
 #include "PlayerCharacter.h"
 
+#include "Enemy.h"
+
 APlayerCharacter::APlayerCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -17,6 +19,8 @@ void APlayerCharacter::BeginPlay()
 	
 	HorizontalLimits = FVector2D(-640.0f, 640.0f);
 	VerticalLimits = FVector2D(-360.0f, 360.0f);
+
+	CapsuleComp->OnComponentBeginOverlap.AddDynamic(this, &APlayerCharacter::OverlapBegin);
 }
 
 void APlayerCharacter::Tick(float DeltaTime)
@@ -24,26 +28,29 @@ void APlayerCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	// Move the player
-	if (MovementDirection.Length() > 0.0f)
+	if (IsAlive)
 	{
-		if (MovementDirection.Length() > 1.0f)
+		if (MovementDirection.Length() > 0.0f)
 		{
-			MovementDirection.Normalize();
-		}
+			if (MovementDirection.Length() > 1.0f)
+			{
+				MovementDirection.Normalize();
+			}
 
-		FVector2D DistanceToMove = MovementDirection * MovementSpeed * DeltaTime;
-		FVector NewLocation = GetActorLocation() + FVector(DistanceToMove.X, 0.0f, 0.0f);
-		if (!IsInMapBoundsHorizontal(NewLocation.X))
-		{
-			NewLocation -= FVector(DistanceToMove.X, 0.0f, 0.0f);
-		}
-		NewLocation += FVector(0.0f, 0.0f, DistanceToMove.Y);
-		if (!IsInMapBoundsVertical(NewLocation.Z))
-		{
-			NewLocation -= FVector(0.0f, 0.0f, DistanceToMove.Y);
-		}
+			FVector2D DistanceToMove = MovementDirection * MovementSpeed * DeltaTime;
+			FVector NewLocation = GetActorLocation() + FVector(DistanceToMove.X, 0.0f, 0.0f);
+			if (!IsInMapBoundsHorizontal(NewLocation.X))
+			{
+				NewLocation -= FVector(DistanceToMove.X, 0.0f, 0.0f);
+			}
+			NewLocation += FVector(0.0f, 0.0f, DistanceToMove.Y);
+			if (!IsInMapBoundsVertical(NewLocation.Z))
+			{
+				NewLocation -= FVector(0.0f, 0.0f, DistanceToMove.Y);
+			}
 
-		SetActorLocation(NewLocation);
+			SetActorLocation(NewLocation);
+		}
 	}
 }
 
@@ -97,4 +104,20 @@ void APlayerCharacter::MoveTrigger(const FInputActionValue& Value)
 void APlayerCharacter::MoveCompleted(const FInputActionValue& Value)
 {
 	MovementDirection = FVector2D(0.0f, 0.0f);
+}
+
+void APlayerCharacter::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	AEnemy* Enemy = Cast<AEnemy>(OtherActor);
+
+	if (Enemy)
+	{
+		if (IsAlive)
+		{
+			IsAlive = false;
+			SpriteComp->SetVisibility(false);
+
+			// ...
+		}
+	}
 }
