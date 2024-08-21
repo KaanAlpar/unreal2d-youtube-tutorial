@@ -17,8 +17,10 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+#if 0
 	HorizontalLimits = FVector2D(-640.0f, 640.0f);
 	VerticalLimits = FVector2D(-360.0f, 360.0f);
+#endif
 
 	CapsuleComp->OnComponentBeginOverlap.AddDynamic(this, &APlayerCharacter::OverlapBegin);
 }
