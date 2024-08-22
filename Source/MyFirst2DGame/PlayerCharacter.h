@@ -14,6 +14,8 @@
 
 #include "PlayerCharacter.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayerDiedDelegate);
+
 UCLASS()
 class MYFIRST2DGAME_API APlayerCharacter : public APawn
 {
@@ -46,6 +48,8 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	FVector2D VerticalLimits;
+
+	FPlayerDiedDelegate PlayerDiedDelegate;
 
 	APlayerCharacter();
 	virtual void BeginPlay() override;

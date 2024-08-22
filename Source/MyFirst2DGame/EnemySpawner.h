@@ -28,7 +28,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float SpawnTime = 3.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float RestartTimerDuration = 3.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float GameStartTimerDuration = 2.0f;
+
 	FTimerHandle SpawnTimer;
+	FTimerHandle RestartTimer;
+	FTimerHandle GameStartTimer;
 
 	APlayerCharacter* Player;
 
@@ -41,4 +49,11 @@ public:
 	void SpawnEnemy();
 
 	void OnSpawnTimerTimeout();
+	void OnRestartTimerTimeout();
+	void OnGameStartTimerTimeout();
+
+	UFUNCTION()
+	void OnPlayerDied();
+
+	void StartNewGame();
 };

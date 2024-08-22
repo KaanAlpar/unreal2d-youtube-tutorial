@@ -38,8 +38,47 @@ void AEnemySpawner::BeginPlay()
 
 		Player->VerticalLimits.X = -GameAreaSize.Y / 2.0f;
 		Player->VerticalLimits.Y = GameAreaSize.Y / 2.0f;
+
+		Player->PlayerDiedDelegate.AddDynamic(this, &AEnemySpawner::OnPlayerDied);
 	}
 
+	StartNewGame();
+}
+
+void AEnemySpawner::StartNewGame()
+{
+	// Destroy all the current enemies
+	TArray<AActor*> EnemySearchArray;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(), EnemySearchArray);
+	if (EnemySearchArray.Num() > 0)
+	{
+		for (AActor* EnemyActor : EnemySearchArray)
+		{
+			AEnemy* Enemy = Cast<AEnemy>(EnemyActor);
+			if (Enemy)
+			{
+				Enemy->Destroy();
+			}
+		}
+	}
+
+	// Reset the player
+	if (Player)
+	{
+		Player->IsAlive = true;
+		Player->SpriteComp->SetVisibility(true);
+		Player->SetActorLocation(FVector(0.0f, 0.0f, 0.0f));
+	}
+
+	// Reset the score
+
+
+	// Start spawning enemies again
+	GetWorldTimerManager().SetTimer(GameStartTimer, this, &AEnemySpawner::OnGameStartTimerTimeout, 1.0f, false, GameStartTimerDuration);
+}
+
+void AEnemySpawner::OnGameStartTimerTimeout()
+{
 	StartSpawning();
 }
 
@@ -111,4 +150,16 @@ void AEnemySpawner::SpawnEnemy()
 		int RandomIndex = FMath::RandRange(0, EnemySprites.Num() - 1);
 		Enemy->SpriteComp->SetSprite(EnemySprites[RandomIndex]);
 	}
+}
+
+void AEnemySpawner::OnPlayerDied()
+{
+	StopSpawning();
+
+	GetWorldTimerManager().SetTimer(RestartTimer, this, &AEnemySpawner::OnRestartTimerTimeout, 1.0f, false, RestartTimerDuration);
+}
+
+void AEnemySpawner::OnRestartTimerTimeout()
+{
+	StartNewGame();
 }

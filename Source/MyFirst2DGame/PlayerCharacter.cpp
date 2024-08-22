@@ -119,7 +119,7 @@ void APlayerCharacter::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AA
 			IsAlive = false;
 			SpriteComp->SetVisibility(false);
 
-			// ...
+			PlayerDiedDelegate.Broadcast();
 		}
 	}
 }
