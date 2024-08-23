@@ -12,6 +12,8 @@
 #include "InputActionValue.h"
 #include "GameFramework/Controller.h"
 
+#include "Sound/SoundBase.h"
+
 #include "PlayerCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayerDiedDelegate);
@@ -27,6 +29,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	UPaperSpriteComponent* SpriteComp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	USoundBase* DieSound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UInputMappingContext* InputMappingContext;

@@ -1,5 +1,7 @@
 #include "PlayerCharacter.h"
 
+#include "Kismet/GameplayStatics.h"
+
 #include "Enemy.h"
 
 APlayerCharacter::APlayerCharacter()
@@ -120,6 +122,8 @@ void APlayerCharacter::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AA
 			SpriteComp->SetVisibility(false);
 
 			PlayerDiedDelegate.Broadcast();
+
+			UGameplayStatics::PlaySound2D(GetWorld(), DieSound);
 		}
 	}
 }
