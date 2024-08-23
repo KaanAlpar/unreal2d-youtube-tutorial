@@ -7,6 +7,7 @@
 
 #include "PlayerCharacter.h"
 #include "Enemy.h"
+#include "MyHUD.h"
 
 #include "EnemySpawner.generated.h"
 
@@ -18,6 +19,12 @@ class MYFIRST2DGAME_API AEnemySpawner : public AActor
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FVector2D GameAreaSize;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UMyHUD> HUDClass;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UMyHUD* HUDWidget;
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AEnemy> EnemyActorToSpawn;
@@ -34,9 +41,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float GameStartTimerDuration = 2.0f;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	int Score = 0;
+
 	FTimerHandle SpawnTimer;
 	FTimerHandle RestartTimer;
 	FTimerHandle GameStartTimer;
+	FTimerHandle ScoreTimer;
 
 	APlayerCharacter* Player;
 
@@ -51,6 +62,9 @@ public:
 	void OnSpawnTimerTimeout();
 	void OnRestartTimerTimeout();
 	void OnGameStartTimerTimeout();
+	void OnScoreTimerTimeout();
+
+	void SetScore(int NewScore);
 
 	UFUNCTION()
 	void OnPlayerDied();

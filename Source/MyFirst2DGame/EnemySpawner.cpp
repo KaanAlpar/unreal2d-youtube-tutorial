@@ -42,6 +42,16 @@ void AEnemySpawner::BeginPlay()
 		Player->PlayerDiedDelegate.AddDynamic(this, &AEnemySpawner::OnPlayerDied);
 	}
 
+	if (HUDClass)
+	{
+		HUDWidget = CreateWidget<UMyHUD>(UGameplayStatics::GetPlayerController(GetWorld(), 0), HUDClass);
+		if (HUDWidget)
+		{
+			HUDWidget->AddToViewport();
+			SetScore(0);
+		}
+	}
+
 	StartNewGame();
 }
 
@@ -71,7 +81,8 @@ void AEnemySpawner::StartNewGame()
 	}
 
 	// Reset the score
-
+	SetScore(0);
+	GetWorldTimerManager().SetTimer(ScoreTimer, this, &AEnemySpawner::OnScoreTimerTimeout, 1.0f, true, 1.0f);
 
 	// Start spawning enemies again
 	GetWorldTimerManager().SetTimer(GameStartTimer, this, &AEnemySpawner::OnGameStartTimerTimeout, 1.0f, false, GameStartTimerDuration);
@@ -156,10 +167,23 @@ void AEnemySpawner::OnPlayerDied()
 {
 	StopSpawning();
 
+	GetWorldTimerManager().ClearTimer(ScoreTimer);
+
 	GetWorldTimerManager().SetTimer(RestartTimer, this, &AEnemySpawner::OnRestartTimerTimeout, 1.0f, false, RestartTimerDuration);
 }
 
 void AEnemySpawner::OnRestartTimerTimeout()
 {
 	StartNewGame();
+}
+
+void AEnemySpawner::OnScoreTimerTimeout()
+{
+	SetScore(Score + 1);
+}
+
+void AEnemySpawner::SetScore(int NewScore)
+{
+	Score = NewScore;
+	HUDWidget->SetScore(Score);
 }
